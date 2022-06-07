@@ -134,7 +134,7 @@ def gameStart():
                             block[i][1] = 1
                         clearCount += 1
 
-                score += int(clearCount * (clearCount + 1) / 2) * 100
+                score += int(clearCount * (clearCount + 1) / 2)
                 makeInf()
 
                 for i in range(1, block_X - 1): # 게임 오버
@@ -245,6 +245,8 @@ def gameStart():
                 elif exitBtn.collidepoint(event.pos):
                     running = False
                     isEnd = True
+
+    saveRecord(loadRecord(), score)
     return state
 
 def moveDown(tx, ty):
@@ -362,3 +364,23 @@ def rvs():
 
     for (x, y) in newBlock:
         block[x][y] = newBlockColor
+
+#saveRecord(loadRecord(), score)
+def loadRecord():
+    currentPath = os.path.dirname(__file__) # 현재 파일의 위치 반환
+    file = open(os.path.join(currentPath, 'record.txt'), 'r')
+
+    high = file.readline()
+
+    file.close()
+
+    return high
+
+def saveRecord(high, record):   # record는 항상 int
+    if high == '' or int(high) < int(record):
+        currentPath = os.path.dirname(__file__) # 현재 파일의 위치 반환
+        file = open(os.path.join(currentPath, 'record.txt'), 'w')
+
+        file.write(str(record))
+
+        file.close()
