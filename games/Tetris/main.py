@@ -13,6 +13,8 @@ ORANGE = (255,165,0)    # 1자
 
 WINSIZE = (720, 720)
 
+currentPath = os.path.dirname(__file__)
+
 def gameStart():
 
     pg.init()
@@ -23,6 +25,8 @@ def gameStart():
 
     BGPath = os.path.dirname(__file__)
     BGPath = os.path.join(BGPath, 'background.jpg')
+
+    
 
     global block
     global newBlock
@@ -128,6 +132,9 @@ def gameStart():
                             fullChk = False
                             break
                     if fullChk == True:
+                        scoreSoundPath = os.path.join(currentPath, 'scoreSound.mp3')
+                        pg.mixer.music.load(scoreSoundPath)
+                        pg.mixer.music.play()
                         for i in range(1, block_X - 1):
                             for j in range(line, 1, -1):
                                 block[i][j] = block[i][j - 1]
@@ -142,6 +149,10 @@ def gameStart():
                         isEnd = True
                         break
                 if isEnd == True:
+                    gameOverSoundPath = os.path.join(os.path.abspath(os.path.join(currentPath, os.pardir)), 'end.mp3')
+                    GOS = pg.mixer.Sound(gameOverSoundPath)
+                    GOS.set_volume(0.2)
+                    GOS.play()
                     break
 
                 newBlockColor = nextColor
@@ -205,18 +216,26 @@ def gameStart():
                     state = 1
                 # 키보드 이벤트
                 elif event.type == pg.KEYDOWN:
+                    blockSoundPath = os.path.join(currentPath, 'blockSound.mp3')
+                    pg.mixer.music.load(blockSoundPath)
                     if event.key == pg.K_LEFT:
+                        pg.mixer.music.play()
                         move(-1, 0)
                     elif event.key == pg.K_RIGHT:
+                        pg.mixer.music.play()
                         move(1, 0)
                     elif event.key == pg.K_DOWN:    # 아래 방향키, 소프트 드랍
+                        pg.mixer.music.play()
                         moveDown(0, 1)
                     elif event.key == pg.K_SPACE:   # 스페이스, 하드 드랍
+                        pg.mixer.music.play()
                         while creatable == False:
                             moveDown(0, 1)
                     elif event.key == pg.K_z:   # z키, 시계 회전
+                        pg.mixer.music.play()
                         turn(1)
                     elif event.key == pg.K_x:   # x키, 뒤집기
+                        pg.mixer.music.play()
                         rvs()
                 elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                     if exitBtn.collidepoint(event.pos):
@@ -232,7 +251,14 @@ def gameStart():
                 state = 1
             # 클릭 이벤트
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+
+                clickSoundPath = os.path.join(os.path.abspath(os.path.join(currentPath, os.pardir, os.pardir)), 'buttonClick.wav')
+                BCS = pg.mixer.Sound(clickSoundPath)
+
                 if playBtn.collidepoint(event.pos):
+
+                    BCS.play()
+
                     score = 0
                     isEnd = False
                     block = [[1 for _ in range(block_Y)] for _ in range(block_X)]   # 0 GRAY, 1 BLACK, 2 BLUE, 3 GREEN, 4 PINK, 5 ORAGNE
@@ -243,6 +269,9 @@ def gameStart():
                         block[0][i] = 0
                         block[block_X - 1][i] = 0
                 elif exitBtn.collidepoint(event.pos):
+
+                    BCS.play()
+
                     running = False
                     isEnd = True
 

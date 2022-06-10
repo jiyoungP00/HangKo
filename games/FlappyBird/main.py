@@ -2,6 +2,8 @@ import pygame
 import random
 import os, sys
 
+currentPath = os.path.dirname(__file__)
+
 def gameStart():
     pygame.init()
 
@@ -92,7 +94,6 @@ def gameStart():
     font2_score = pygame.font.Font('freesansbold.ttf', 40)
 
     def gameover():
-
         maxscore = max(score_list)
         display1 = font1_gameover.render(f"Game Over", True, (200,35,35))
         screen.blit(display1, (145, 350))
@@ -115,10 +116,19 @@ def gameStart():
 
         while waiting:
             if collision1 == True or collision2 == True:
+                collision1 = False
+                collision2 = False
+
                 gameover()
-                start()
-            else:
-                start()
+
+                gameOverSoundPath = os.path.join(os.path.abspath(os.path.join(currentPath, os.pardir)), 'end.mp3')
+                GOS = pygame.mixer.Sound(gameOverSoundPath)
+                GOS.set_volume(0.2)
+                GOS.play()
+
+                pygame.time.delay(1000)
+
+            start()
 
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -140,52 +150,56 @@ def gameStart():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
+                state = 1
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
+                    jumpSoundPath = os.path.join(currentPath, 'jumpSound.mp3')
+                    pygame.mixer.music.load(jumpSoundPath)
+                    pygame.mixer.music.play()
+
                     to_y = -10
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
                     to_y = 2
    
-
-        bird_y_pos += to_y
+        if running:
+            bird_y_pos += to_y
  
-        # 경계값 처리
-        if bird_y_pos <= 0:
-            bird_y_pos = 0
-        if bird_y_pos >= height:
-            bird_y_pos = height - character_height 
+            # 경계값 처리
+            if bird_y_pos <= 0:
+                bird_y_pos = 0
+            if bird_y_pos >= height:
+                bird_y_pos = height - character_height 
 
-    # 장애물 움직이기
-        obstacle_1_x_pos += obstacle_1_to_x
-        obstacle_2_x_pos += obstacle_2_to_x
+        # 장애물 움직이기
+            obstacle_1_x_pos += obstacle_1_to_x
+            obstacle_2_x_pos += obstacle_2_to_x
 
-        # 충돌
-        collision1 = collision_detection1(obstacle_1_x_pos, obstacle_1_height, bird_y_pos, bottom_1_y)
-        collision2 = collision_detection2(obstacle_2_x_pos, obstacle_2_height, bird_y_pos, bottom_2_y)
+            # 충돌
+            collision1 = collision_detection1(obstacle_1_x_pos, obstacle_1_height, bird_y_pos, bottom_1_y)
+            collision2 = collision_detection2(obstacle_2_x_pos, obstacle_2_height, bird_y_pos, bottom_2_y)
                 
-        if collision1 or collision2 :
-            score_list.append(score)
-            waiting = True
+            if collision1 or collision2 :
+                score_list.append(score)
+                waiting = True
 
-        # 새롭게 장애물 만들기
-        if obstacle_1_x_pos <= -10:
-            obstacle_1_x_pos = width
-            obstacle_1_height = random.randint(100, 300)
-            score += 1
+            # 새롭게 장애물 만들기
+            if obstacle_1_x_pos <= -10:
+                obstacle_1_x_pos = width
+                obstacle_1_height = random.randint(100, 300)
+                score += 1
 
-        if obstacle_2_x_pos <= -10:
-            obstacle_2_x_pos = width
-            obstacle_2_height = random.randint(100, 300)
-            score += 1
+            if obstacle_2_x_pos <= -10:
+                obstacle_2_x_pos = width
+                obstacle_2_height = random.randint(100, 300)
+                score += 1
 
-        display_obstacle1(obstacle_1_height)
-        display_obstacle2(obstacle_2_height)
-        display_bird(bird_x_pos, bird_y_pos)
-        score_display(score)
+            display_obstacle1(obstacle_1_height)
+            display_obstacle2(obstacle_2_height)
+            display_bird(bird_x_pos, bird_y_pos)
+            score_display(score)
 
-        pygame.display.update()
+            pygame.display.update()
 
     saveRecord(loadRecord(), score)
     return state
